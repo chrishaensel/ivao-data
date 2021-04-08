@@ -63,16 +63,22 @@ class Ivao {
 			throw new \Exception( "App name must be given according to IVAO R&R. Aborting." );
 		}
 
-		if ( count( $options ) > 0 ) {
-			if ( isset( $options['create_json'] ) ) {
-				$this->create_json = intval( $options['create_json'] ) == 1;
-			}
-		}
-
 		$this->local_status_txt_filename        = "{$this->tmp_dir}{$this->ds}{$this->ivao_status_file_name}";
 		$this->local_whazzup_txt_filename       = "{$this->tmp_dir}{$this->ds}{$this->ivao_whazzup_file_name}";
 		$this->local_clean_whazzup_txt_filename = "{$this->tmp_dir}{$this->ds}{$this->clean_whazzup_file_name}";
 		$this->local_json_whazzup_txt_filename  = "{$this->tmp_dir}{$this->ds}{$this->json_whazzup_file_name}";
+
+		if ( count( $options ) > 0 ) {
+			if ( isset( $options['create_json'] ) ) {
+				$this->create_json = intval( $options['create_json'] ) == 1;
+
+				if ( isset( $options['json_file'] ) && strlen( $options['json_file'] ) > 0 ) {
+					$this->local_json_whazzup_txt_filename = trim( $options['json_file'] );
+				}
+
+			}
+		}
+
 
 		$this->app_name = trim( $app_name );
 		$this->checkStatusTxtFreshness();
@@ -93,24 +99,6 @@ class Ivao {
 		}
 
 		$this->downloadWhazzupData();
-	}
-
-
-	/**
-	 * get the whole data of the whazzup.txt as JSON
-	 *
-	 * @return false|string
-	 */
-	public function getJson() {
-		if ( file_exists( $this->local_clean_whazzup_txt_filename ) ) {
-			$csv   = file_get_contents( $this->local_clean_whazzup_txt_filename );
-			$array = array_map( "str_getcsv", explode( "\n", $csv ) );
-			$json  = json_encode( $array );
-
-			return $json;
-		}
-
-		return null;
 	}
 
 	/**
@@ -266,6 +254,8 @@ class Ivao {
 				$contents = gzread( $fp, 1000000 );
 				file_put_contents( $this->local_whazzup_txt_filename, $contents );
 				gzclose( $fp );
+				// Cleanup: we don't need the gz-file anymore
+				unlink( "{$this->tmp_dir}{$this->ds}whazzup.txt.gz" );
 			} else {
 				// We need to use uncompressed whazzup because there is no gzurl in the status.txt
 				$whazzup_url = $urls['url0'];
@@ -376,7 +366,7 @@ class Ivao {
 	 *
 	 * @return mixed
 	 */
-	public function getFileAge( string $filemtime, string $format = "h" ) {
+	private function getFileAge( string $filemtime, string $format = "h" ) {
 		$file_datetime = date( "Y/m/d H:i:s", $filemtime );
 
 
@@ -387,7 +377,7 @@ class Ivao {
 		return $interval->$format;
 	}
 
-	public function onlineDuration( string $connection_time = null ) {
+	private function onlineDuration( string $connection_time = null ) {
 		if ( preg_match( "/[!\D]/", $connection_time ) ) {
 			// Do we have any stuff other than digits? Then this is not the connection time. RUN!
 			return null;
