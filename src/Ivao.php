@@ -81,6 +81,12 @@ class Ivao {
 
 
 		$this->app_name = trim( $app_name );
+
+		// Create the temporary directory, if it doesn't exist
+		if(!is_dir($this->tmp_dir)) {
+			mkdir($this->tmp_dir);
+		}
+
 		$this->checkStatusTxtFreshness();
 
 	}
