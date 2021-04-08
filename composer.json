@@ -1,0 +1,17 @@
+{
+    "name": "chrishaensel/ivao-data",
+    "description": "Simple PHP lib to download IVAO whazzup data while conforming to the IVAO rules.",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Christian Haensel",
+            "email": "chris@haensel.pro"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "chrishaensel\\": "src/"
+        }
+    },
+    "license": "MIT"
+}
