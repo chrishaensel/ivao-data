@@ -1,6 +1,6 @@
 {
     "name": "chrishaensel/ivao-data",
-    "description": "Simple PHP lib to download IVAO whazzup data while conforming to the IVAO rules.",
+    "description": "Simple PHP lib to download IVAO whazzup data while conforming to the IVAO rules. Please read their rules carefully!",
     "type": "library",
     "authors": [
         {
